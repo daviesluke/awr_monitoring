@@ -1,0 +1,91 @@
+CREATE OR REPLACE PACKAGE py_awr_monitor
+AS
+        DaysToKeep NUMBER := 367;
+        
+        LogDirectory VARCHAR2(30) := 'PYTHIAN_LOG_FILES_DIR';
+
+        PROCEDURE initialize;
+
+        PROCEDURE load_old_data (
+                  metric_name_lookup  VARCHAR2 DEFAULT '%'
+                , metric_type_lookup  VARCHAR2 DEFAULT '%'
+        );
+
+        PROCEDURE check_daily_stats (
+                  snap_date          DATE
+                , instance           NUMBER   DEFAULT 1
+        );
+
+        PROCEDURE collect_metrics (
+                  snap_date          DATE
+                , do_report          BOOLEAN  DEFAULT TRUE
+		, do_email           BOOLEAN  DEFAULT TRUE
+                , metric_name_lookup VARCHAR2 DEFAULT '%'
+                , metric_type_lookup VARCHAR2 DEFAULT '%'
+        );
+
+        PROCEDURE enable_metric (
+                  metric_name_lookup VARCHAR2
+                , metric_type_lookup VARCHAR2
+                , amt_threshold_IN   NUMBER   DEFAULT 10000
+                , pct_threshold_IN   NUMBER   DEFAULT 50
+                , spike_threshold_IN NUMBER   DEFAULT 20
+        );
+
+        PROCEDURE disable_metric (
+                  metric_name_lookup  VARCHAR2
+                , metric_type_lookup  VARCHAR2
+        );
+
+        PROCEDURE enable_monitoring (
+                  instance            NUMBER DEFAULT 1
+        );
+
+        PROCEDURE disable_monitoring;
+
+        PROCEDURE delete_stats (
+                  snap_date           DATE
+                , metric_name_lookup  VARCHAR2 DEFAULT '%'
+                , metric_type_lookup  VARCHAR2 DEFAULT '%'
+        );
+
+        PROCEDURE include_stats (
+                  snap_date           DATE
+                , metric_name_lookup  VARCHAR2 DEFAULT '%'
+                , metric_type_lookup  VARCHAR2 DEFAULT '%'
+        );
+
+        PROCEDURE exclude_stats (
+                  snap_date           DATE
+                , metric_name_lookup  VARCHAR2 DEFAULT '%'
+                , metric_type_lookup  VARCHAR2 DEFAULT '%'
+        );
+
+        PROCEDURE populate_daily (
+                  snap_date            DATE
+                , min_snap_id          NUMBER
+                , max_snap_id          NUMBER
+                , instance             NUMBER   DEFAULT 1
+                , metric_name_lookup   VARCHAR2 DEFAULT '%'
+                , metric_type_lookup   VARCHAR2 DEFAULT '%'
+        );
+
+        PROCEDURE populate_hist (
+                  snap_date          DATE
+                , metric_name_lookup VARCHAR2 DEFAULT '%'
+                , metric_type_lookup VARCHAR2 DEFAULT '%'
+        );
+
+        PROCEDURE write_logs (
+                  snap_date DATE
+        );
+
+	FUNCTION  write_logs (
+		  snap_date DATE
+	) RETURN NUMBER;
+
+        PROCEDURE email_logs;
+	
+END py_awr_monitor;
+/
+
